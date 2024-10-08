@@ -19,7 +19,7 @@ void YUVWorker::addImage(
     // (that way is due to Linux)
     unsigned long long fileSize;
     is.seekg (0, std::ios::end);
-    fileSize = (int)is.tellg() - 1;
+    fileSize = (unsigned long long)is.tellg();
     is.seekg (0, std::ios::beg);
 
     // frame data (width, height, frame count)
@@ -95,24 +95,34 @@ void YUVWorker::merge(
 // maybe there is better method, but idk
 std::tuple<int, int, int> YUVWorker::getStat(unsigned long long size)
 {
-    double frames = size / 720 / 576 / 3. * 2.;
+
+    std::cout << size << "\n";
+    double frames = size / 1920 / 1080 / 3. * 2;
     if (frames == (double)std::floor(frames))
     {
-        return tuple_i{720, 576, (int)frames};
+        return tuple_i{1920, 1080, (int)frames};
     }
     else
     {
-        frames = size / 352 / 288 / 3. * 2;
-        if (frames == std::floor(frames))
+        frames = size / 720 / 576 / 3. * 2.;
+        if (frames == (double)std::floor(frames))
         {
-            return tuple_i{352, 288, (int)frames};
+            return tuple_i{720, 576, (int)frames};
         }
         else
         {
-            frames = size / 176 / 144 / 3. * 2;   
+            frames = size / 352 / 288 / 3. * 2;
             if (frames == std::floor(frames))
             {
-                return tuple_i{176, 144, (int)frames};
+                return tuple_i{352, 288, (int)frames};
+            }
+            else
+            {
+                frames = size / 176 / 144 / 3. * 2;   
+                if (frames == std::floor(frames))
+                {
+                    return tuple_i{176, 144, (int)frames};
+                }
             }
         }
     }
