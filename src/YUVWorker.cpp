@@ -64,20 +64,26 @@ void YUVWorker::merge(
     int imageLength = image.size() / 3 * 2;
     int frameLength = frame.size() / 3 * 2;
 
+    // rewrite y values on frame
     for (int i = 0; i < image.info.second; ++i)
         for (int j = 0; j < image.info.first; ++j)
         {
             frame[frame.info.first * i + j] = image[image.info.first * i + j];
         }
 
+    
+    int imageVStart = imageLength * 5 / 4;
+    int frameVStart = frameLength * 5 / 4;
+    int imageVRow = image.info.first / 2;
+    int frameVRow = frame.info.first / 2;
+
+    // rewrite u and v values
     for (int i = 0; i < image.info.second / 2; ++i)
         for (int j = 0; j < image.info.first / 2; ++j)
         {
-            frame[frameLength + frame.info.first / 2 * i + j] = image[imageLength + image.info.first / 2 * i + j];
-            frame[frameLength * 5 / 4 + frame.info.first / 2 * i + j] = image[imageLength * 5 / 4 + image.info.first / 2 * i + j];
+            frame[frameLength + frameVRow * i + j] = image[imageLength + imageVRow * i + j];
+            frame[frameVStart + frameVRow * i + j] = image[imageVStart + imageVRow * i + j];
         }
-
-
 }
 
 
