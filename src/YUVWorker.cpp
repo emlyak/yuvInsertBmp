@@ -27,8 +27,9 @@ void YUVWorker::addImage(
 
     // bytes count of one frame
     int frameLength = std::get<0>(frameData) * std::get<1>(frameData) * 1.5;
-    std::vector<BYTE> frame;
-    frame.resize(frameLength);
+    Frame frame;
+    frame.info = std::move(std::pair<int, int> (std::get<0>(frameData), std::get<1>(frameData)));
+    frame.data.resize(frameLength);
     
     // skip new lines
     is.unsetf(std::ios::skipws);
@@ -43,9 +44,9 @@ void YUVWorker::addImage(
 
     for (int i = 0; i < std::get<2>(frameData); ++i)
     {
-        is.read(reinterpret_cast<std::ifstream::char_type*>(&frame.front()), frameLength);
+        is.read(reinterpret_cast<std::ifstream::char_type*>(&frame.data.front()), frameLength);
         merge(frame, reader.getYUV());        
-        os.write(reinterpret_cast<std::ifstream::char_type*>(&frame.front()), frame.size());
+        os.write(reinterpret_cast<std::ifstream::char_type*>(&frame.data.front()), frame.data.size());
         is.seekg((i + 1) * frameLength);
         std::cout << "Обработано фрэймов: " << i + 1 << "\n";
     }
@@ -56,30 +57,25 @@ void YUVWorker::addImage(
 
 
 void YUVWorker::merge(
-        std::vector<BYTE>& frame,
-        std::vector<BYTE>& image
+        Frame& frame,
+        Frame& image
 )
 {
     int imageLength = image.size() / 3 * 2;
     int frameLength = frame.size() / 3 * 2;
 
-    std::copy(
-        image.begin(),
-        image.begin() + imageLength,
-        frame.begin()
-    );
+    for (int i = 0; i < image.info.second; ++i)
+        for (int j = 0; j < image.info.first; ++j)
+        {
+            frame[frame.info.first * i + j] = image[image.info.first * i + j];
+        }
 
-    std::copy(
-        image.begin() + imageLength,
-        image.end() + imageLength * 5 / 4,
-        frame.begin() + frameLength
-    );
-
-    std::copy(
-        image.end() - imageLength / 4,
-        image.end(),
-        frame.begin() + frameLength * 5 / 4
-    );
+    for (int i = 0; i < image.info.second / 2; ++i)
+        for (int j = 0; j < image.info.first / 2; ++j)
+        {
+            frame[frameLength + frame.info.first / 2 * i + j] = image[imageLength + image.info.first / 2 * i + j];
+            frame[frameLength * 5 / 4 + frame.info.first / 2 * i + j] = image[imageLength * 5 / 4 + image.info.first / 2 * i + j];
+        }
 
 
 }

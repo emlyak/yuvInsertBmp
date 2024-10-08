@@ -31,8 +31,8 @@ void BMPReader::closeBMP()
     bmpFile.reset();
 
     // delete all data in vector
-    yuv.erase(yuv.begin(), yuv.end());
-    yuv.shrink_to_fit();
+    yuv.data.erase(yuv.begin(), yuv.end());
+    yuv.data.shrink_to_fit();
 }
 
 void BMPReader::toYUV()
@@ -42,9 +42,8 @@ void BMPReader::toYUV()
     int rowPadding = (4 - (usefullRowSize % 4)) % 4;
     int rowSize = usefullRowSize + rowPadding;
     
-    yuv.resize(usefullRowSize * bmpFile->dibh.height);
+    yuv.data.resize(usefullRowSize * bmpFile->dibh.height);
 
-    
     
     int ptr = 0;
 
@@ -57,16 +56,18 @@ void BMPReader::toYUV()
             ptr += 3;
         }
 
-    bmpFile->data = yuv;
+    bmpFile->data = yuv.data;  
+
     int yuvSize = ptr / 2;
-    rowSize = yuv.size() / bmpFile->dibh.height;
-    yuv.resize(yuvSize);
+    rowSize = yuv.data.size() / bmpFile->dibh.height;
+    yuv.info = std::pair<int, int>(rowSize / 3, bmpFile->dibh.height);
+    yuv.data.resize(yuvSize);
     
     double Y, U, V;
     ptr = 0;
     for(int i = 0; i < bmpFile->data.size(); i+=3)
     {
-        YfromRGB(Y, bmpFile->data[i], bmpFile->data[i+1], bmpFile->data[i+2]);
+        YfromRGB(Y, bmpFile->data[i+2], bmpFile->data[i+1], bmpFile->data[i]);
         yuv[ptr] = Y;
         ++ptr;
     }
@@ -74,7 +75,7 @@ void BMPReader::toYUV()
     for(int i = 0; i < bmpFile->dibh.height; i += 2)
         for (int j = rowSize * i; j < rowSize * (i + 1); j += 6)
         {
-            UfromRGB(U, bmpFile->data[j], bmpFile->data[j+1], bmpFile->data[j+2]);
+            UfromRGB(U, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
             yuv[ptr] = U;
             ++ptr;
         }
@@ -82,13 +83,13 @@ void BMPReader::toYUV()
     for(int i = 0; i < bmpFile->dibh.height; i += 2)
         for (int j = rowSize * i; j < rowSize * (i + 1); j += 6)
         {
-            VfromRGB(V, bmpFile->data[j], bmpFile->data[j+1], bmpFile->data[j+2]);
+            VfromRGB(V, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
             yuv[ptr] = V;
             ++ptr;
         }
 }
 
-std::vector<BYTE>& BMPReader::getYUV()
+Frame& BMPReader::getYUV()
 {
     return yuv;
 }
