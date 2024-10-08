@@ -1,12 +1,9 @@
 #ifndef BMP_READER_H
 #define BMP_READER_H
 
-#include <cstdint>
-#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <iterator>
 #include <memory>
 #include <Frame.h>
 #include <thread>

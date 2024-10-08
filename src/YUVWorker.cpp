@@ -53,11 +53,10 @@ void YUVWorker::addImage(
         merge(frame, reader.getYUV());        
         os.write(reinterpret_cast<std::ifstream::char_type*>(&frame.data.front()), frame.data.size());
         is.seekg((i + 1) * frameLength);
-        std::cout << "Обработано фрэймов: " << i + 1 << "\n";
     }
-    reader.closeBMP();
     is.close();
     os.close();
+    reader.closeBMP();
 };
 
 
@@ -95,8 +94,6 @@ void YUVWorker::merge(
 // maybe there is better method, but idk
 std::tuple<int, int, int> YUVWorker::getStat(unsigned long long size)
 {
-
-    std::cout << size << "\n";
     double frames = size / 1920 / 1080 / 3. * 2;
     if (frames == (double)std::floor(frames))
     {

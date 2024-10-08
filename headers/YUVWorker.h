@@ -2,10 +2,8 @@
 #define YUVWORKER_H
 
 #include <string>
-#include <iterator>
 #include "bmp_reader.h"
 #include "Frame.h"
-// #include <utility>
 #include <cmath>
 #include <iostream>
 
