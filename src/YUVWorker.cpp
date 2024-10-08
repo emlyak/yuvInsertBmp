@@ -24,6 +24,11 @@ void YUVWorker::addImage(
 
     // frame data (width, height, frame count)
     auto frameData = getStat(fileSize);
+    if (std::get<0>(frameData) == 0)
+    {
+        std::cout << "Unknown video resolution. Exiting...";
+        return;
+    }
 
     // bytes count of one frame
     int frameLength = std::get<0>(frameData) * std::get<1>(frameData) * 1.5;

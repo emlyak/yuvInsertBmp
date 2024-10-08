@@ -44,35 +44,51 @@ void BMPReader::toYUV()
     
     yuv.data.resize(usefullRowSize * bmpFile->dibh.height);
 
-    
-    int ptr = 0;
-
     yuv.info = std::pair<int, int>(rowSize / 3, bmpFile->dibh.height);
     yuv.data.resize(bmpFile->dibh.height * bmpFile->dibh.width * 3 / 2);
     
     double Y, U, V;
-    ptr = 0;
 
-    for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= rowSize)
-        for (int j = i; j < i + usefullRowSize; j += bytesPerPixel)
-        {
-            YfromRGB(Y, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
-            yuv[ptr++] = Y;
+    std::thread t1 (
+        [&](){
+            int ptr = 0;
+            for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= rowSize)
+                for (int j = i; j < i + usefullRowSize; j += bytesPerPixel)
+                {
+                    YfromRGB(Y, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
+                    yuv[ptr++] = Y;
+                }
         }
+    );
 
-    for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
-        for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
-        {
-            UfromRGB(U, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
-            yuv[ptr++] = U;
+    std::thread t2 (
+        [&](){
+            int ptr = bmpFile->dibh.height * bmpFile->dibh.width;
+            for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
+                for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
+                {
+                    UfromRGB(U, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
+                    yuv[ptr++] = U;
+                }
         }
+    );
+
+    std::thread t3 (
+        [&](){
+            int ptr = bmpFile->dibh.height * bmpFile->dibh.width * 5 / 4;
+            for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
+                for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
+                {
+                    VfromRGB(V, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
+                    yuv[ptr++] = V;
+                }
+        }
+    );
+   
+   t1.join();
+   t2.join();
+   t3.join();
     
-    for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
-        for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
-        {
-            VfromRGB(V, bmpFile->data[j+2], bmpFile->data[j+1], bmpFile->data[j]);
-            yuv[ptr++] = V;
-        }
 }
 
 Frame& BMPReader::getYUV()
