@@ -46,6 +46,7 @@ struct BMPFile
     DIBHeader dibh;
 
     std::vector<BYTE> data;
+    short rowPadding;
 
     void toString();
 };

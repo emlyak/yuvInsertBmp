@@ -27,8 +27,11 @@ bool BMPReader::openBMP(const std::string& fileName)
         return false;
     }
 
-    int data_size = bmpFile->dibh.width * bmpFile->dibh.height *
-        bmpFile->dibh.bitsPerPixel / 8;
+    // calculate row padding in bytes
+    bmpFile->rowPadding = (4 - (bmpFile->dibh.bitsPerPixel / 8 * bmpFile->dibh.width % 4)) % 4;
+
+    int data_size = (bmpFile->dibh.width *
+        bmpFile->dibh.bitsPerPixel / 8 + bmpFile->rowPadding) * bmpFile->dibh.height;
     
     is.seekg(bmpFile->bmph.offset);
     
@@ -53,8 +56,7 @@ void BMPReader::toYUV()
 { 
     int bytesPerPixel = bmpFile->dibh.bitsPerPixel / 8;
     int usefullRowSize = bytesPerPixel * bmpFile->dibh.width;
-    int rowPadding = (4 - (usefullRowSize % 4)) % 4;
-    int rowSize = usefullRowSize + rowPadding;
+    int rowSize = usefullRowSize + bmpFile->rowPadding;
 
     yuv.info = std::pair<int, int>(rowSize / 3, bmpFile->dibh.height);
     yuv.data.resize(bmpFile->dibh.height * bmpFile->dibh.width * 3 / 2);
