@@ -11,7 +11,7 @@ void YUVWorker::addImage(
     is.open (vidPath, std::ios::binary | std::ios::in);
     if (!is.is_open())
     {
-        std::cout << "can't open file";
+        std::cout << "can't open file: " << vidPath << "\n";
         return;
     }
 
@@ -46,6 +46,11 @@ void YUVWorker::addImage(
 
     // open stream for writing modified video
     std::ofstream os(std::string(outPrefix + "/output.yuv"), std::ios::binary|std::ios::out);
+    if (!os.is_open())
+    {
+        std::cout << "can't open file output file\n";
+        return;
+    }
 
     for (int i = 0; i < std::get<2>(frameData); ++i)
     {
