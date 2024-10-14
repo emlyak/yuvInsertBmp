@@ -1,9 +1,9 @@
 #include "YUVWorker.h"
 
 void YUVWorker::addImage(
-    std::string vidPath,
-    std::string picPath,
-    std::string outPrefix
+    std::string&& vidPath,
+    std::string&& picPath,
+    std::string&& outPrefix
 )
 {
 
@@ -11,7 +11,7 @@ void YUVWorker::addImage(
     is.open (vidPath, std::ios::binary | std::ios::in);
     if (!is.is_open())
     {
-        std::cout << "can't open file";
+        std::cout << "can't open file: " << vidPath << "\n";
         return;
     }
 
@@ -41,11 +41,26 @@ void YUVWorker::addImage(
 
     // read bmp picture
     BMPReader reader{};
-    reader.openBMP(picPath);
+    if (!reader.openBMP(picPath))
+        return;
+    
+    if (reader.getWidth() > frame.info.first ||
+        reader.getHeight() > frame.info.second)
+        {
+            std::cout << "Picture size is too big. For this video it's must be less then "
+                << frame.info.first << "x" << frame.info.second << "\n";
+            return;
+        }
+
     reader.toYUV();
 
     // open stream for writing modified video
     std::ofstream os(std::string(outPrefix + "/output.yuv"), std::ios::binary|std::ios::out);
+    if (!os.is_open())
+    {
+        std::cout << "can't open file output file\n";
+        return;
+    }
 
     for (int i = 0; i < std::get<2>(frameData); ++i)
     {
@@ -57,6 +72,8 @@ void YUVWorker::addImage(
     is.close();
     os.close();
     reader.closeBMP();
+
+    std::cout << "Job done successfully\n";
 };
 
 

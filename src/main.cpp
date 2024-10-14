@@ -5,7 +5,7 @@
 int main(int argc, char* argv[])
 {
     YUVWorker::addImage(argv[1], argv[2], argv[3]);
-    std::cout << "Done!\n";
+    std::cout << "Exiting...\n";
 
     return 0;
 }

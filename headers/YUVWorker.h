@@ -16,9 +16,9 @@ public:
     YUVWorker() = delete;
 
     static void addImage(
-        std::string vidPath,
-        std::string picPath,
-        std::string outPrefix
+        std::string&& vidPath,
+        std::string&& picPath,
+        std::string&& outPrefix
     );
 
 private:
