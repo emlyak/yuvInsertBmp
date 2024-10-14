@@ -1,9 +1,9 @@
 #include "YUVWorker.h"
 
 void YUVWorker::addImage(
-    std::string vidPath,
-    std::string picPath,
-    std::string outPrefix
+    std::string&& vidPath,
+    std::string&& picPath,
+    std::string&& outPrefix
 )
 {
 

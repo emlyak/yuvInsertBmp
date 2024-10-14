@@ -58,7 +58,7 @@ void BMPReader::toYUV()
     int usefullRowSize = bytesPerPixel * bmpFile->dibh.width;
     int rowSize = usefullRowSize + bmpFile->rowPadding;
 
-    yuv.info = std::pair<int, int>(rowSize / 3, bmpFile->dibh.height);
+    yuv.info = std::move(std::pair<int, int>(rowSize / 3, bmpFile->dibh.height));
     yuv.data.resize(bmpFile->dibh.height * bmpFile->dibh.width * 3 / 2);
 
     std::thread t1 (
@@ -102,15 +102,13 @@ void BMPReader::toYUV()
    
    t1.join();
    t2.join();
-   t3.join();
-    
+   t3.join(); 
 }
 
 Frame& BMPReader::getYUV()
 {
     return yuv;
 }
-
 
 bool BMPReader::isValid() const
 {

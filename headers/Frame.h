@@ -15,11 +15,21 @@ public:
 
     Frame() = default;
 
-    Frame(std::vector<BYTE>& data_, std::pair<int, int>& info_)
+    Frame(std::vector<BYTE>&& data_, std::pair<int, int>&& info_)
     {
         data = std::move(data_);
         info = std::move(info_);
     }
+
+    Frame(Frame& rhs)
+    : data(rhs.data),
+    info(rhs.info)
+    {}
+
+    Frame(Frame&& rhs)
+    : data(std::move(data)),
+    info(std::move(info))
+    {}
 
     std::vector<BYTE>::iterator begin()
     {

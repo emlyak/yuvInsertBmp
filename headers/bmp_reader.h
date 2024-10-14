@@ -19,8 +19,6 @@ struct BMPHeader {
     uint16_t unused1;
     uint16_t unused2;
     uint32_t offset;
-
-    void toString();
 };
 
 
@@ -36,8 +34,6 @@ struct DIBHeader {
     uint32_t pHeight;
     uint32_t colors_count;
     uint32_t important_colors_count;
-
-    void toString();
 };
 
 struct BMPFile
@@ -47,8 +43,6 @@ struct BMPFile
 
     std::vector<BYTE> data;
     short rowPadding;
-
-    void toString();
 };
 
 #pragma pop
@@ -56,6 +50,8 @@ struct BMPFile
 class BMPReader
 {
 public:
+    BMPReader() = default;
+
     bool openBMP(const std::string& fileName);
     void closeBMP();
     Frame& getYUV();
