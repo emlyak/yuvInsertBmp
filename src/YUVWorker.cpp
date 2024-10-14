@@ -41,7 +41,9 @@ void YUVWorker::addImage(
 
     // read bmp picture
     BMPReader reader{};
-    reader.openBMP(picPath);
+    if (!reader.openBMP(picPath))
+        return;
+    
     reader.toYUV();
 
     // open stream for writing modified video
@@ -62,6 +64,8 @@ void YUVWorker::addImage(
     is.close();
     os.close();
     reader.closeBMP();
+
+    std::cout << "Job done successfully\n";
 };
 
 

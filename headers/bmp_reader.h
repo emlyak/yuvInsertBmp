@@ -55,7 +55,7 @@ struct BMPFile
 class BMPReader
 {
 public:
-    void openBMP(const std::string& fileName);
+    bool openBMP(const std::string& fileName);
     void closeBMP();
     Frame& getYUV();
     void toYUV();

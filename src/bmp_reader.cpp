@@ -1,12 +1,12 @@
 #include "bmp_reader.h"
 
-void BMPReader::openBMP(const std::string& fileName)
+bool BMPReader::openBMP(const std::string& fileName)
 {
     std::ifstream is{fileName, std::ios::binary|std::ios::in};
     if (!is.is_open())
     {
         std::cout << "Can't open this file: " << fileName << "\n";
-        return;
+        return false;
     }
 
     bmpFile = std::unique_ptr<BMPFile>(new BMPFile());
@@ -21,8 +21,9 @@ void BMPReader::openBMP(const std::string& fileName)
     
     bmpFile->data.resize(data_size);
     is.read(reinterpret_cast<std::ifstream::char_type*>(&bmpFile->data.front()), data_size);
-
     is.close();
+    
+    return true;
 }
 
 void BMPReader::closeBMP()
