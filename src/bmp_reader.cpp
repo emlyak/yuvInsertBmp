@@ -22,7 +22,7 @@ bool BMPReader::openBMP(const std::string& fileName)
     bmpFile->data.resize(data_size);
     is.read(reinterpret_cast<std::ifstream::char_type*>(&bmpFile->data.front()), data_size);
     is.close();
-    
+
     return true;
 }
 
@@ -42,16 +42,13 @@ void BMPReader::toYUV()
     int usefullRowSize = bytesPerPixel * bmpFile->dibh.width;
     int rowPadding = (4 - (usefullRowSize % 4)) % 4;
     int rowSize = usefullRowSize + rowPadding;
-    
-    yuv.data.resize(usefullRowSize * bmpFile->dibh.height);
 
     yuv.info = std::pair<int, int>(rowSize / 3, bmpFile->dibh.height);
     yuv.data.resize(bmpFile->dibh.height * bmpFile->dibh.width * 3 / 2);
-    
-    double Y, U, V;
 
     std::thread t1 (
         [&](){
+            double Y;  
             int ptr = 0;
             for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= rowSize)
                 for (int j = i; j < i + usefullRowSize; j += bytesPerPixel)
@@ -64,6 +61,7 @@ void BMPReader::toYUV()
 
     std::thread t2 (
         [&](){
+            double U;
             int ptr = bmpFile->dibh.height * bmpFile->dibh.width;
             for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
                 for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
@@ -76,6 +74,7 @@ void BMPReader::toYUV()
 
     std::thread t3 (
         [&](){
+            double V;
             int ptr = bmpFile->dibh.height * bmpFile->dibh.width * 5 / 4;
             for (int i (bmpFile->dibh.data_size - rowSize); i > -1; i -= 2 * rowSize)
                 for (int j = i; j < i + usefullRowSize; j += 2 * bytesPerPixel)
