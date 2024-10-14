@@ -57,6 +57,16 @@ public:
     Frame& getYUV();
     void toYUV();
     
+    int getWidth() const
+    {
+        return bmpFile->dibh.width;
+    }
+
+    int getHeight() const
+    {
+        return bmpFile->dibh.height;
+    }
+    
 
 private:
     Frame yuv;

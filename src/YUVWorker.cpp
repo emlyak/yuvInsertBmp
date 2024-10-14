@@ -44,6 +44,14 @@ void YUVWorker::addImage(
     if (!reader.openBMP(picPath))
         return;
     
+    if (reader.getWidth() > frame.info.first ||
+        reader.getHeight() > frame.info.second)
+        {
+            std::cout << "Picture size is too big. For this video it's must be less then "
+                << frame.info.first << "x" << frame.info.second << "\n";
+            return;
+        }
+
     reader.toYUV();
 
     // open stream for writing modified video
