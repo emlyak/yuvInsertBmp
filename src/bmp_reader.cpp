@@ -12,7 +12,20 @@ bool BMPReader::openBMP(const std::string& fileName)
     bmpFile = std::unique_ptr<BMPFile>(new BMPFile());
 
     is.read(reinterpret_cast<std::ifstream::char_type*>(&bmpFile->bmph), sizeof(BMPHeader));
+    // check the magic number
+    if (bmpFile->bmph.ID[0] != 'B' && bmpFile->bmph.ID[1] != 'M')
+    {
+        is.close();
+        return false;
+    }
+
     is.read(reinterpret_cast<std::ifstream::char_type*>(&bmpFile->dibh), sizeof(DIBHeader));
+    // check format
+    if (!isValid())
+    {
+        is.close();
+        return false;
+    }
 
     int data_size = bmpFile->dibh.width * bmpFile->dibh.height *
         bmpFile->dibh.bitsPerPixel / 8;
@@ -94,4 +107,34 @@ void BMPReader::toYUV()
 Frame& BMPReader::getYUV()
 {
     return yuv;
+}
+
+
+bool BMPReader::isValid() const
+{
+    if (bmpFile->dibh.bitsPerPixel != 0x18)
+    {
+        std::cout << "Please, use 24-bits bmp-file without alpha-channel\n";
+        return false;
+    }
+
+    if(bmpFile->dibh.BI_RGB != 0x0)
+    {
+        std::cout << "Please, use bmp-file without compression\n";
+        return false;
+    }
+
+    if(bmpFile->dibh.color_planes != 0x1)
+    {
+        std::cout << "Please, use bmp-file without color planes\n";
+        return false;
+    }
+
+    if(bmpFile->dibh.colors_count != 0x0)
+    {
+        std::cout << "Please, use bmp-file without color palette\n";
+        return false;
+    }
+        
+    return true;
 }

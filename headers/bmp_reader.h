@@ -79,6 +79,8 @@ private:
     {
         V = ((112 * R -  94 * G -  18 * B + 128) / 256) + 128;
     }
+
+    bool isValid() const;
 };
 
 #endif //BMP_READER_H
